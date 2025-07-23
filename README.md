@@ -1,4 +1,37 @@
-Snowflake & Streamlit: Role-Based Sales Dashboard DemoThis repository contains the code and setup instructions for a demonstration project showcasing how to build a secure, role-based dashboard using Streamlit in Snowflake (SiS). The application displays sales data that is dynamically filtered based on the Snowflake role of the user viewing the app.Key Concepts DemonstratedStreamlit in Snowflake (SiS): Building and deploying a Python web application directly within the Snowflake ecosystem.Dynamic Row-Level Security: Using a secure VIEW in conjunction with Snowflake's IS_ROLE_IN_SESSION() context function to filter data dynamically and securely at query time.Role-Based Access Control (RBAC): Creating and managing specific business roles (ADMIN_ROLE, SALES_EAST_ROLE, SALES_WEST_ROLE) to control data visibility.Custom CSS Styling: Injecting custom CSS to enhance the visual design and user experience of a Streamlit application.How It WorksThe core of the security model is the FILTERED_SALES_VIEW. Instead of the Streamlit app querying the base SALES_DATA table directly, it queries this view.The view's WHERE clause uses the IS_ROLE_IN_SESSION() function to check which of the defined business roles are active in the current user's session hierarchy.An ADMIN_ROLE sees all data.A SALES_EAST_ROLE sees only data where the REGION is 'East'.A SALES_WEST_ROLE sees only data where the REGION is 'West'.This ensures that the data filtering logic is enforced within Snowflake, providing a robust and secure way to manage data access without exposing sensitive logic in the front-end application code.Setup & UsagePrerequisitesA Snowflake account.A user with privileges to create databases, schemas, tables, views, and roles (e.g., ACCOUNTADMIN).A virtual warehouse to run the Streamlit app's queries.Step 1: Run the SQL Setup ScriptExecute the following SQL script in a Snowflake worksheet. This will create the necessary database, schema, roles, sample data table, and the secure view.Remember to replace COMPUTE_WH with your warehouse and CCHAFFINS with your test user's login name.-- =========================================================
+# Snowflake & Streamlit: Role-Based Sales Dashboard Demo
+
+This repository contains the code and setup instructions for a demonstration project showcasing how to build a secure, role-based dashboard using Streamlit in Snowflake (SiS). The application displays sales data that is dynamically filtered based on the Snowflake role of the user viewing the app.
+
+## Key Concepts Demonstrated
+* **Streamlit in Snowflake (SiS):** Building and deploying a Python web application directly within the Snowflake ecosystem.
+* **Dynamic Row-Level Security:** Using a secure `VIEW` in conjunction with Snowflake's `IS_ROLE_IN_SESSION()` context function to filter data dynamically and securely at query time.
+* **Role-Based Access Control (RBAC):** Creating and managing specific business roles (`ADMIN_ROLE`, `SALES_EAST_ROLE`, `SALES_WEST_ROLE`) to control data visibility.
+* **Custom CSS Styling:** Injecting custom CSS to enhance the visual design and user experience of a Streamlit application.
+
+## How It Works
+The core of the security model is the `FILTERED_SALES_VIEW`. Instead of the Streamlit app querying the base `SALES_DATA` table directly, it queries this view.
+
+The view's `WHERE` clause uses the `IS_ROLE_IN_SESSION()` function to check which of the defined business roles are active in the current user's session hierarchy.
+* An `ADMIN_ROLE` sees all data.
+* A `SALES_EAST_ROLE` sees only data where the `REGION` is 'East'.
+* A `SALES_WEST_ROLE` sees only data where the `REGION` is 'West'.
+
+This ensures that the data filtering logic is enforced within Snowflake, providing a robust and secure way to manage data access without exposing sensitive logic in the front-end application code.
+
+## Setup & Usage
+
+### Prerequisites
+* A Snowflake account.
+* A user with privileges to create databases, schemas, tables, views, and roles (e.g., `ACCOUNTADMIN`).
+* A virtual warehouse to run the Streamlit app's queries.
+
+### Step 1: Run the SQL Setup Script
+Execute the following SQL script in a Snowflake worksheet. This will create the necessary database, schema, roles, sample data table, and the secure view.
+
+**Remember to replace `COMPUTE_WH` with your warehouse and `CCHAFFINS` with your test user's login name.**
+
+```sql
+-- =========================================================
 -- SQL SETUP FOR STREAMLIT ROLE-BASED DASHBOARD DEMO
 -- =========================================================
 
@@ -72,7 +105,20 @@ GRANT ROLE SALES_WEST_ROLE TO ROLE ACCOUNTADMIN;
 -- 8. Grant Streamlit creation privileges
 GRANT CREATE STREAMLIT ON SCHEMA STREAMLIT_DEMO_DB.DEMO_SCHEMA TO ROLE ADMIN_ROLE;
 GRANT CREATE STAGE ON SCHEMA STREAMLIT_DEMO_DB.DEMO_SCHEMA TO ROLE ADMIN_ROLE;
-Step 2: Create the Streamlit App in SnowflakeNavigate to the Streamlit section in the Snowflake UI (Snowsight).Click + Streamlit App.Name your application (e.g., Role Based Sales Dashboard).Place the app in the STREAMLIT_DEMO_DB database and DEMO_SCHEMA schema.Select a warehouse for the app to run on.Click Create.You will be taken to a new Streamlit app with boilerplate code. Replace the contents of the editor with the Python code below.Application Code (streamlit_app.py)# streamlit_app.py
+```
+
+### Step 2: Create the Streamlit App in Snowflake
+1.  Navigate to the **Streamlit** section in the Snowflake UI (Snowsight).
+2.  Click **+ Streamlit App**.
+3.  Name your application (e.g., `Role Based Sales Dashboard`).
+4.  Place the app in the `STREAMLIT_DEMO_DB` database and `DEMO_SCHEMA` schema.
+5.  Select a warehouse for the app to run on.
+6.  Click **Create**.
+7.  You will be taken to a new Streamlit app with boilerplate code. Replace the contents of the editor with the Python code below.
+
+### Application Code (`streamlit_app.py`)
+```python
+# streamlit_app.py
 import streamlit as st
 from snowflake.snowpark.context import get_active_session
 import pandas as pd # Used for displaying data
@@ -186,4 +232,8 @@ except Exception as e:
 
 st.markdown("---")
 st.info("To test the filtering, grant/revoke the business roles from the Streamlit app's owner role and refresh.")
-Step 3: Test the Role-Based AccessRun the app. The "owner" of the Streamlit app is typically a high-level role (like ACCOUNTADMIN if you ran the script as-is). Since ACCOUNTADMIN was granted all three business roles, it should see all 8 records.To test the filtering, you can change the owner of the Streamlit App to a different role or grant/revoke the business roles (SALES_EAST_ROLE, ADMIN_ROLE, etc.) from the owner role and refresh the app to see the data change.
+```
+
+### Step 3: Test the Role-Based Access
+1.  Run the app. The "owner" of the Streamlit app is typically a high-level role (like `ACCOUNTADMIN` if you ran the script as-is). Since `ACCOUNTADMIN` was granted all three business roles, it should see all 8 records.
+2.  To test the filtering, you can change the owner of the Streamlit App to a different role or grant/revoke the business roles (`SALES_EAST_ROLE`, `ADMIN_ROLE`, etc.) from the owner role and refresh the app to see the data change.
