@@ -18,6 +18,10 @@ The view's `WHERE` clause uses the `IS_ROLE_IN_SESSION()` function to check whic
 
 This ensures that the data filtering logic is enforced within Snowflake, providing a robust and secure way to manage data access without exposing sensitive logic in the front-end application code.
 
+## File Structure
+* `Streamlit_App_Setup.sql`: The SQL script to set up the database, roles, and secure view in Snowflake.
+* `streamlit_app.py`: The Python code for the Streamlit dashboard application.
+
 ## Setup & Usage
 
 ### Prerequisites
@@ -25,10 +29,10 @@ This ensures that the data filtering logic is enforced within Snowflake, providi
 * A user with privileges to create databases, schemas, tables, views, and roles (e.g., `ACCOUNTADMIN`).
 * A virtual warehouse to run the Streamlit app's queries.
 
-### Step 1: Run the SQL Setup Script
-Execute the following SQL script in a Snowflake worksheet. This will create the necessary database, schema, roles, sample data table, and the secure view.
+### Step 1: Run the SQL Setup Script (`Streamlit_App_Setup.sql`)
+Execute the SQL script from the `Streamlit_App_Setup.sql` file in a Snowflake worksheet. This will create the necessary database, schema, roles, sample data table, and the secure view.
 
-**Remember to replace `COMPUTE_WH` with your warehouse and `CCHAFFINS` with your test user's login name.**
+**Remember to replace `COMPUTE_WH` with your warehouse and `CCHAFFINS` with your test user's login name in the script.**
 
 ```sql
 -- =========================================================
@@ -114,7 +118,7 @@ GRANT CREATE STAGE ON SCHEMA STREAMLIT_DEMO_DB.DEMO_SCHEMA TO ROLE ADMIN_ROLE;
 4.  Place the app in the `STREAMLIT_DEMO_DB` database and `DEMO_SCHEMA` schema.
 5.  Select a warehouse for the app to run on.
 6.  Click **Create**.
-7.  You will be taken to a new Streamlit app with boilerplate code. Replace the contents of the editor with the Python code below.
+7.  You will be taken to a new Streamlit app with boilerplate code. Replace the contents of the editor with the Python code from the `streamlit_app.py` file.
 
 ### Application Code (`streamlit_app.py`)
 ```python
